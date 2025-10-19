@@ -7,9 +7,11 @@ description: API endpoints for managing National In-service Training (NITs).
 
 This section provides information about the endpoints for managing National In-service Training (NITs).
 
-## POST /nits
+## Create a new training session
 
 Creates a new training session.
+
+**Endpoint:** `POST /v1/nits`
 
 **Request Body:**
 
@@ -28,3 +30,184 @@ Creates a new training session.
 *   `start_date`: Must be a valid date and time.
 *   `end_date`: Must be a valid date and time, and must be after the `start_date`.
 *   `location`: Must not be empty and must be less than or equal to 100 characters.
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "course_id": 1,
+    "start_date": "2025-12-01T00:00:00Z",
+    "end_date": "2025-12-05T00:00:00Z",
+    "location": "Training Academy"
+}' "http://localhost:4000/v1/nits"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "nit": {
+        "id": 1,
+        "course_id": 1,
+        "start_date": "2025-12-01T00:00:00Z",
+        "end_date": "2025-12-05T00:00:00Z",
+        "location": "Training Academy",
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the request body is invalid or validation fails, you will receive a `422 Unprocessable Entity` response.
+
+---
+
+## Retrieve a training session
+
+Retrieves a specific training session by its unique ID.
+
+**Endpoint:** `GET /v1/nits/:id`
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/nits/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "nit": {
+        "id": 1,
+        "course_id": 1,
+        "start_date": "2025-12-01T00:00:00Z",
+        "end_date": "2025-12-05T00:00:00Z",
+        "location": "Training Academy",
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the training session with the specified ID does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Update a training session
+
+Updates a specific training session's details. You only need to provide the fields you want to change.
+
+**Endpoint:** `PATCH /v1/nits/:id`
+
+**Request Body (Partial):**
+
+```json
+{
+    "location": "New Training Academy"
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X PATCH -H "Content-Type: application/json" -d '{
+    "location": "New Training Academy"
+}' "http://localhost:4000/v1/nits/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "nit": {
+        "id": 1,
+        "course_id": 1,
+        "start_date": "2025-12-01T00:00:00Z",
+        "end_date": "2025-12-05T00:00:00Z",
+        "location": "New Training Academy",
+        "version": 2
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the training session does not exist, you will receive a `404 Not Found` response.
+*   If validation fails, you will receive a `422 Unprocessable Entity` response.
+*   If there is an edit conflict, you will receive a `409 Conflict` response.
+
+---
+
+## Delete a training session
+
+Deletes a specific training session by its ID.
+
+**Endpoint:** `DELETE /v1/nits/:id`
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:4000/v1/nits/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "message": "nit successfully deleted"
+}
+```
+
+**Error Handling:**
+
+*   If the training session with the specified ID does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## List all training sessions
+
+Retrieves a list of all training sessions. This endpoint supports pagination to handle large datasets efficiently.
+
+**Endpoint:** `GET /v1/nits`
+
+**Query Parameters:**
+
+*   `page` (integer): The page number to retrieve. Defaults to `1`.
+*   `page_size` (integer): The number of records to retrieve per page. Defaults to `20`, with a maximum of `100`.
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/nits?page=1&page_size=5"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "nits": [
+        {
+            "id": 1,
+            "course_id": 1,
+            "start_date": "2025-12-01T00:00:00Z",
+            "end_date": "2025-12-05T00:00:00Z",
+            "location": "Training Academy",
+            "version": 1
+        }
+    ],
+    "metadata": {
+        "current_page": 1,
+        "page_size": 5,
+        "first_page": 1,
+        "last_page": 1,
+        "total_records": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If you provide invalid query parameters (e.g., `page=-1`), you will receive a `422 Unprocessable Entity` response with validation errors.

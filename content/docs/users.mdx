@@ -1,0 +1,140 @@
+---
+title: Users
+description: API endpoints for managing users.
+---
+
+# Users
+
+This section provides detailed information about the API endpoints for managing users.
+
+## Register User
+
+Registers a new user.
+
+**Endpoint:** `POST /v1/users`
+
+**Request Body:**
+
+```json
+{
+    "name": "Alice",
+    "email": "alice@example.com",
+    "password": "pa55word"
+}
+```
+
+**Validation Rules:**
+
+*   `name`: Required. Must not be empty.
+*   `email`: Required. Must be a valid email address.
+*   `password`: Required. Must be at least 8 characters long.
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "name": "Alice",
+    "email": "alice@example.com",
+    "password": "pa55word"
+}' "http://localhost:4000/v1/users"
+```
+
+**Example Success Response (202 Accepted):**
+
+```json
+{
+    "user": {
+        "id": 1,
+        "name": "Alice",
+        "email": "alice@example.com",
+        "activated": false,
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the request body is invalid or validation fails, you will receive a `422 Unprocessable Entity` response.
+
+---
+
+## Activate User
+
+Activates a user account.
+
+**Endpoint:** `PUT /v1/users/activated`
+
+**Request Body:**
+
+```json
+{
+    "token": "<activation_token>"
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X PUT -H "Content-Type: application/json" -d '{
+    "token": "J3Z3..."
+}' "http://localhost:4000/v1/users/activated"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "user": {
+        "id": 1,
+        "name": "Alice",
+        "email": "alice@example.com",
+        "activated": true,
+        "version": 2
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the token is invalid or expired, you will receive a `422 Unprocessable Entity` response.
+
+---
+
+## Create Authentication Token
+
+Creates an authentication token for a user.
+
+**Endpoint:** `POST /v1/tokens/authentication`
+
+**Request Body:**
+
+```json
+{
+    "email": "alice@example.com",
+    "password": "pa55word"
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "email": "alice@example.com",
+    "password": "pa55word"
+}' "http://localhost:4000/v1/tokens/authentication"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "authentication_token": {
+        "token": "<auth_token>"
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the request body is invalid or the credentials are incorrect, you will receive a `401 Unauthorized` response.
