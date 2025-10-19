@@ -1,0 +1,264 @@
+---
+title: Feedback and Ratings
+description: API endpoints for managing feedback and ratings.
+---
+
+# Feedback and Ratings
+
+This section provides detailed information about the API endpoints for managing feedback and ratings.
+
+## Create Facilitator Feedback
+
+Creates feedback for a specific facilitator.
+
+**Endpoint:** `POST /v1/facilitators/:id/feedback`
+
+**Request Body:**
+
+```json
+{
+  "session_enrollment_id": 1,
+  "score": 5,
+  "comment": "Excellent facilitator!"
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+  "session_enrollment_id": 1,
+  "score": 5,
+  "comment": "Excellent facilitator!"
+}' "http://localhost:4000/v1/facilitators/1/feedback"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "feedback": {
+        "id": 1,
+        "facilitator_id": 1,
+        "session_enrollment_id": 1,
+        "score": 5,
+        "comment": "Excellent facilitator!",
+        "created_at": "..."
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the facilitator does not exist, you will receive a `404 Not Found` response.
+*   If the request body is invalid, you will receive a `422 Unprocessable Entity` response.
+
+---
+
+## List Facilitator Feedback
+
+Retrieves all feedback for a specific facilitator.
+
+**Endpoint:** `GET /v1/facilitators/:id/feedback`
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/facilitators/1/feedback"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "feedback": [
+        {
+            "id": 1,
+            "facilitator_id": 1,
+            "session_enrollment_id": 1,
+            "score": 5,
+            "comment": "Excellent facilitator!",
+            "created_at": "..."
+        }
+    ]
+}
+```
+
+**Error Handling:**
+
+*   If the facilitator does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Create Course Feedback
+
+Creates feedback for a specific course.
+
+**Endpoint:** `POST /v1/courses/:id/feedback`
+
+**Request Body:**
+
+```json
+{
+  "session_enrollment_id": 1,
+  "score": 4,
+  "comment": "The course was very informative."
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+  "session_enrollment_id": 1,
+  "score": 4,
+  "comment": "The course was very informative."
+}' "http://localhost:4000/v1/courses/1/feedback"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "feedback": {
+        "id": 1,
+        "course_id": 1,
+        "session_enrollment_id": 1,
+        "score": 4,
+        "comment": "The course was very informative.",
+        "created_at": "..."
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the course does not exist, you will receive a `404 Not Found` response.
+*   If the request body is invalid, you will receive a `422 Unprocessable Entity` response.
+
+---
+
+## List Course Feedback
+
+Retrieves all feedback for a specific course.
+
+**Endpoint:** `GET /v1/courses/:id/feedback`
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/courses/1/feedback"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "feedback": [
+        {
+            "id": 1,
+            "course_id": 1,
+            "session_enrollment_id": 1,
+            "score": 4,
+            "comment": "The course was very informative.",
+            "created_at": "..."
+        }
+    ]
+}
+```
+
+**Error Handling:**
+
+*   If the course does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Create Course Rating
+
+Submits a rating for a course, linked to a specific enrollment.
+
+**Endpoint:** `POST /v1/enrollments/:id/courserating`
+
+**Request Body:**
+
+```json
+{
+    "score": 5,
+    "comment": "Great course!"
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "score": 5,
+    "comment": "Great course!"
+}' "http://localhost:4000/v1/enrollments/1/courserating"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "feedback": {
+        "id": 1,
+        "course_id": 1,
+        "session_enrollment_id": 1,
+        "score": 5,
+        "comment": "Great course!",
+        "created_at": "..."
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the enrollment does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Create Facilitator Rating
+
+Submits a rating for a facilitator, linked to a specific enrollment.
+
+**Endpoint:** `POST /v1/enrollments/:id/facilitatorrating`
+
+**Request Body:**
+
+```json
+{
+    "facilitator_id": 1,
+    "score": 5,
+    "comment": "Excellent facilitator!"
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "facilitator_id": 1,
+    "score": 5,
+    "comment": "Excellent facilitator!"
+}' "http://localhost:4000/v1/enrollments/1/facilitatorrating"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "feedback": {
+        "id": 1,
+        "facilitator_id": 1,
+        "session_enrollment_id": 1,
+        "score": 5,
+        "comment": "Excellent facilitator!",
+        "created_at": "..."
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the enrollment or facilitator does not exist, you will receive a `404 Not Found` response.

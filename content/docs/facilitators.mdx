@@ -1,0 +1,307 @@
+---
+title: Facilitators
+description: API endpoints for managing facilitators.
+---
+
+# Facilitators
+
+This section provides detailed information about the API endpoints for managing facilitators.
+
+## List Facilitators
+
+Retrieves a list of all facilitators. This endpoint supports pagination to handle large datasets efficiently.
+
+**Endpoint:** `GET /v1/facilitators`
+
+**Query Parameters:**
+
+*   `page` (integer): The page number to retrieve. Defaults to `1`.
+*   `page_size` (integer): The number of records to retrieve per page. Defaults to `20`, with a maximum of `100`.
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/facilitators?page=1&page_size=5"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "facilitators": [
+        {
+            "id": 1,
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "johndoe@example.com",
+            "personnel_id": 1,
+            "version": 1
+        }
+    ],
+    "metadata": {
+        "current_page": 1,
+        "page_size": 5,
+        "first_page": 1,
+        "last_page": 1,
+        "total_records": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If you provide invalid query parameters (e.g., `page=-1`), you will receive a `422 Unprocessable Entity` response with validation errors.
+
+---
+
+## Create Facilitator
+
+Creates a new facilitator record in the database.
+
+**Endpoint:** `POST /v1/facilitators`
+
+**Request Body:**
+
+```json
+{
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "janesmith@example.com",
+    "personnel_id": 2
+}
+```
+
+**Validation Rules:**
+
+*   `first_name`, `last_name`, `email`: Required.
+*   `personnel_id`: Optional. If provided, must be a valid officer ID.
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "janesmith@example.com",
+    "personnel_id": 2
+}' "http://localhost:4000/v1/facilitators"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "facilitator": {
+        "id": 2,
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "email": "janesmith@example.com",
+        "personnel_id": 2,
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If validation fails, you will receive a `422 Unprocessable Entity` response.
+
+---
+
+## Get Facilitator
+
+Retrieves a specific facilitator by their unique ID.
+
+**Endpoint:** `GET /v1/facilitators/:id`
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/facilitators/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "facilitator": {
+        "id": 1,
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "johndoe@example.com",
+        "personnel_id": 1,
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the facilitator does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Update Facilitator
+
+Updates a specific facilitator's details.
+
+**Endpoint:** `PATCH /v1/facilitators/:id`
+
+**Request Body (Partial):**
+
+```json
+{
+    "email": "john.doe@newemail.com"
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X PATCH -H "Content-Type: application/json" -d '{
+    "email": "john.doe@newemail.com"
+}' "http://localhost:4000/v1/facilitators/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "facilitator": {
+        "id": 1,
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@newemail.com",
+        "personnel_id": 1,
+        "version": 2
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the facilitator does not exist, you will receive a `404 Not Found` response.
+*   If validation fails, you will receive a `422 Unprocessable Entity` response.
+
+---
+
+## Delete Facilitator
+
+Deletes a specific facilitator by their ID.
+
+**Endpoint:** `DELETE /v1/facilitators/:id`
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:4000/v1/facilitators/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "message": "facilitator successfully deleted"
+}
+```
+
+**Error Handling:**
+
+*   If the facilitator does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Assign Facilitator to Session
+
+Assigns a facilitator to a specific training session.
+
+**Endpoint:** `POST /v1/sessions/:id/facilitators`
+
+**Request Body:**
+
+```json
+{
+    "facilitator_id": 1
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "facilitator_id": 1
+}' "http://localhost:4000/v1/sessions/1/facilitators"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "message": "facilitator assigned to session successfully"
+}
+```
+
+**Error Handling:**
+
+*   If the session or facilitator does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Remove Facilitator from Session
+
+Removes a facilitator from a specific training session.
+
+**Endpoint:** `DELETE /v1/sessions/:id/facilitators/:facilitator_id`
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:4000/v1/sessions/1/facilitators/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "message": "facilitator removed from session successfully"
+}
+```
+
+**Error Handling:**
+
+*   If the session or facilitator does not exist, or if the facilitator is not assigned to the session, you will receive a `404 Not Found` response.
+
+---
+
+## List Facilitators for Session
+
+Retrieves a list of all facilitators assigned to a specific training session.
+
+**Endpoint:** `GET /v1/sessions/:id/facilitators`
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/sessions/1/facilitators"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "facilitators": [
+        {
+            "id": 1,
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "johndoe@example.com",
+            "personnel_id": 1,
+            "version": 1
+        }
+    ]
+}
+```
+
+**Error Handling:**
+
+*   If the session does not exist, you will receive a `404 Not Found` response.

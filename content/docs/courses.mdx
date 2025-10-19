@@ -1,0 +1,236 @@
+---
+title: Courses
+description: API endpoints for managing courses.
+---
+
+# Courses
+
+This section provides detailed information about the API endpoints for managing courses.
+
+## List Courses
+
+Retrieves a list of all courses. This endpoint supports pagination to handle large datasets efficiently.
+
+**Endpoint:** `GET /v1/courses`
+
+**Query Parameters:**
+
+*   `page` (integer): The page number to retrieve. Defaults to `1`.
+*   `page_size` (integer): The number of records to retrieve per page. Defaults to `20`, with a maximum of `100`.
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/courses?page=1&page_size=5"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "courses": [
+        {
+            "id": 1,
+            "title": "Advanced Investigation Techniques",
+            "description": "A course on modern investigation methods.",
+            "category": "Mandatory",
+            "credit_hours": 40.5,
+            "version": 1
+        }
+    ],
+    "metadata": {
+        "current_page": 1,
+        "page_size": 5,
+        "first_page": 1,
+        "last_page": 1,
+        "total_records": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If you provide invalid query parameters (e.g., `page=-1`), you will receive a `422 Unprocessable Entity` response with validation errors.
+
+**Example Validation Error Response:**
+
+```json
+{
+    "error": {
+        "page": "must be greater than zero",
+        "page_size": "must be greater than zero"
+    }
+}
+```
+
+---
+
+## Create Course
+
+Creates a new course record in the database.
+
+**Endpoint:** `POST /v1/courses`
+
+**Request Body:**
+
+```json
+{
+    "title": "Advanced Investigation Techniques",
+    "description": "A course on modern investigation methods.",
+    "category": "Mandatory",
+    "credit_hours": 40.5
+}
+```
+
+**Validation Rules:**
+
+*   `title`: Required. Must not be empty and must be less than or equal to 255 characters.
+*   `description`: Optional. Must be less than or equal to 1000 characters.
+*   `category`: Required. Must be either "Mandatory" or "Elective".
+*   `credit_hours`: Required. Must be a positive number.
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "title": "Cybersecurity Fundamentals",
+    "description": "An introductory course on cybersecurity.",
+    "category": "Elective",
+    "credit_hours": 30
+}' "http://localhost:4000/v1/courses"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "course": {
+        "id": 2,
+        "title": "Cybersecurity Fundamentals",
+        "description": "An introductory course on cybersecurity.",
+        "category": "Elective",
+        "credit_hours": 30,
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the request body is invalid or validation fails, you will receive a `422 Unprocessable Entity` response.
+
+**Example Validation Error Response:**
+
+```json
+{
+    "error": {
+        "title": "must be provided",
+        "credit_hours": "must be a positive number"
+    }
+}
+```
+
+---
+
+## Get Course
+
+Retrieves a specific course by its unique ID.
+
+**Endpoint:** `GET /v1/courses/:id`
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/courses/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "course": {
+        "id": 1,
+        "title": "Advanced Investigation Techniques",
+        "description": "A course on modern investigation methods.",
+        "category": "Mandatory",
+        "credit_hours": 40.5,
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the course with the specified ID does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Update Course
+
+Updates a specific course's details. You only need to provide the fields you want to change.
+
+**Endpoint:** `PATCH /v1/courses/:id`
+
+**Request Body (Partial):**
+
+```json
+{
+    "title": "Advanced Investigative Techniques",
+    "credit_hours": 45
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X PATCH -H "Content-Type: application/json" -d '{
+    "credit_hours": 42
+}' "http://localhost:4000/v1/courses/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "course": {
+        "id": 1,
+        "title": "Advanced Investigation Techniques",
+        "description": "A course on modern investigation methods.",
+        "category": "Mandatory",
+        "credit_hours": 42,
+        "version": 2
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the course does not exist, you will receive a `404 Not Found` response.
+*   If validation fails, you will receive a `422 Unprocessable Entity` response.
+*   If there is an edit conflict, you will receive a `409 Conflict` response.
+
+---
+
+## Delete Course
+
+Deletes a specific course by its ID.
+
+**Endpoint:** `DELETE /v1/courses/:id`
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:4000/v1/courses/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "message": "course successfully deleted"
+}
+```
+
+**Error Handling:**
+
+*   If the course with the specified ID does not exist, you will receive a `404 Not Found` response.

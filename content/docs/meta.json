@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "index",
+    "officers",
+    "courses",
+    "facilitators",
+    "feedback",
+    "healthcheck",
+    "nits"
+  ]
+}

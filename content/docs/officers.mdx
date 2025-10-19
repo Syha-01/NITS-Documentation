@@ -1,0 +1,261 @@
+---
+title: Officers
+description: API endpoints for managing officers.
+---
+
+# Officers
+
+This section provides detailed information about the API endpoints for managing officers.
+
+## List Officers
+
+Retrieves a list of all officers. This endpoint supports pagination to handle large datasets efficiently.
+
+**Endpoint:** `GET /v1/officers`
+
+**Query Parameters:**
+
+*   `page` (integer): The page number to retrieve. Defaults to `1`.
+*   `page_size` (integer): The number of records to retrieve per page. Defaults to `20`, with a maximum of `100`.
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/officers?page=1&page_size=5"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "officers": [
+        {
+            "id": 1,
+            "regulation_number": "12345",
+            "first_name": "John",
+            "last_name": "Doe",
+            "sex": "Male",
+            "rank_id": 1,
+            "formation_id": 1,
+            "posting_id": 1,
+            "is_active": true,
+            "version": 1
+        }
+    ],
+    "metadata": {
+        "current_page": 1,
+        "page_size": 5,
+        "first_page": 1,
+        "last_page": 1,
+        "total_records": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If you provide invalid query parameters (e.g., `page=-1`), you will receive a `422 Unprocessable Entity` response with validation errors.
+
+**Example Validation Error Response:**
+
+```json
+{
+    "error": {
+        "page": "must be greater than zero",
+        "page_size": "must be greater than zero"
+    }
+}
+```
+
+---
+
+## Create Officer
+
+Creates a new officer record in the database.
+
+**Endpoint:** `POST /v1/officers`
+
+**Request Body:**
+
+```json
+{
+    "regulation_number": "12345",
+    "first_name": "John",
+    "last_name": "Doe",
+    "sex": "Male",
+    "rank_id": 1,
+    "formation_id": 1,
+    "posting_id": 1,
+    "is_active": true
+}
+```
+
+**Validation Rules:**
+
+*   `regulation_number`: Required. Must not be empty and must be less than or equal to 50 characters.
+*   `first_name`: Required. Must not be empty and must be less than or equal to 100 characters.
+*   `last_name`: Required. Must not be empty and must be less than or equal to 100 characters.
+*   `sex`: Required. Must be either "Male" or "Female".
+*   `rank_id`, `formation_id`, `posting_id`: Required. Must be valid IDs.
+
+**Example Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "regulation_number": "54321",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "sex": "Female",
+    "rank_id": 2,
+    "formation_id": 2,
+    "posting_id": 2,
+    "is_active": true
+}' "http://localhost:4000/v1/officers"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "officer": {
+        "id": 2,
+        "regulation_number": "54321",
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "sex": "Female",
+        "rank_id": 2,
+        "formation_id": 2,
+        "posting_id": 2,
+        "is_active": true,
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the request body is invalid or validation fails, you will receive a `422 Unprocessable Entity` response.
+
+**Example Validation Error Response:**
+
+```json
+{
+    "error": {
+        "regulation_number": "must be provided",
+        "first_name": "must be provided"
+    }
+}
+```
+
+---
+
+## Get Officer
+
+Retrieves a specific officer by their unique ID.
+
+**Endpoint:** `GET /v1/officers/:id`
+
+**Example Request:**
+
+```bash
+curl "http://localhost:4000/v1/officers/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "officer": {
+        "id": 1,
+        "regulation_number": "12345",
+        "first_name": "John",
+        "last_name": "Doe",
+        "sex": "Male",
+        "rank_id": 1,
+        "formation_id": 1,
+        "posting_id": 1,
+        "is_active": true,
+        "version": 1
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the officer with the specified ID does not exist, you will receive a `404 Not Found` response.
+
+---
+
+## Update Officer
+
+Updates a specific officer's details. You only need to provide the fields you want to change.
+
+**Endpoint:** `PATCH /v1/officers/:id`
+
+**Request Body (Partial):**
+
+```json
+{
+    "first_name": "Johnny",
+    "is_active": false
+}
+```
+
+**Example Request:**
+
+```bash
+curl -X PATCH -H "Content-Type: application/json" -d '{
+    "first_name": "Johnny"
+}' "http://localhost:4000/v1/officers/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "officer": {
+        "id": 1,
+        "regulation_number": "12345",
+        "first_name": "Johnny",
+        "last_name": "Doe",
+        "sex": "Male",
+        "rank_id": 1,
+        "formation_id": 1,
+        "posting_id": 1,
+        "is_active": true,
+        "version": 2
+    }
+}
+```
+
+**Error Handling:**
+
+*   If the officer does not exist, you will receive a `404 Not Found` response.
+*   If validation fails, you will receive a `422 Unprocessable Entity` response.
+*   If there is an edit conflict (e.g., trying to update an old version of the record), you will receive a `409 Conflict` response.
+
+---
+
+## Delete Officer
+
+Deletes a specific officer by their ID.
+
+**Endpoint:** `DELETE /v1/officers/:id`
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost:4000/v1/officers/1"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "message": "officer successfully deleted"
+}
+```
+
+**Error Handling:**
+
+*   If the officer with the specified ID does not exist, you will receive a `404 Not Found` response.

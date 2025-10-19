@@ -1,0 +1,24 @@
+---
+title: Healthcheck
+description: API endpoint to check the status of the application.
+---
+
+# Healthcheck
+
+This section provides information about the healthcheck endpoint.
+
+## GET /healthcheck
+
+Checks the status of the API.
+
+**Response:**
+
+```json
+{
+    "status": "available",
+    "system_info": {
+        "environment": "development",
+        "version": "1.0.0"
+    }
+}
+```
