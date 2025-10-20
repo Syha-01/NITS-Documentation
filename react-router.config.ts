@@ -15,7 +15,13 @@ export default {
     }
 
     for await (const entry of glob('**/*.mdx', { cwd: 'content/docs' })) {
-      paths.push(getUrl(getSlugs(entry)));
+      const url = getUrl(getSlugs(entry));
+      // prevent double slashes for the index page
+      if (url.endsWith('/')) {
+        paths.push(url);
+      } else {
+        paths.push(`${url}/`);
+      }
     }
 
     return paths;
