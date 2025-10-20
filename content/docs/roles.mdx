@@ -1,0 +1,107 @@
+---
+title: Roles
+description: The different roles and what endpoints they have acces to.
+---
+
+### Public (Unauthenticated Users)
+
+Anyone can access these endpoints without logging in:
+
+- __`POST /v1/users`__: Register a new user account.
+- __`PUT /v1/users/activated`__: Activate a user account with a valid token.
+- __`POST /v1/tokens/authentication`__: Log in to get an authentication token.
+- __`GET /v1/healthcheck`__: Check the status of the API.
+
+### Authenticated Users (Any Role)
+
+Any user who is logged in and has an activated account can perform the following actions:
+
+- __`POST /v1/enrollments/:id/courserating`__: Submit a rating for a course they are enrolled in.
+- __`POST /v1/enrollments/:id/facilitatorrating`__: Submit a rating for a facilitator in a course they are enrolled in.
+
+---
+
+### Role-Based Permissions
+
+Here are the specific capabilities for each role defined in your system:
+
+#### 1. System User (`role_id = 3`)
+
+This is a __read-only__ role. A System User can view data but cannot create, change, or delete anything.
+
+- __Permissions__: `officers:read`, `facilitators:read`, `courses:read`, `nits:read`
+
+- __Accessible Endpoints__:
+
+  - `GET /v1/officers` and `GET /v1/officers/:id`
+  - `GET /v1/facilitators` and `GET /v1/facilitators/:id`
+  - `GET /v1/courses` and `GET /v1/courses/:id`
+  - `GET /v1/nits` and `GET /v1/nits/:id`
+  - `GET /v1/sessions/:id/facilitators`
+
+#### 2. Content Contributor (`role_id = 2`)
+
+This role can manage the main resources of the application but cannot delete them or manage administrative settings.
+
+- __Permissions__: Includes all "read" and "write" permissions for officers, facilitators, courses, and NITs.
+
+- __Accessible Endpoints__:
+
+  - __Officers__:
+
+    - `GET /v1/officers` (List)
+    - `GET /v1/officers/:id` (View)
+    - `POST /v1/officers` (Create)
+    - `PATCH /v1/officers/:id` (Update)
+
+  - __Facilitators__:
+
+    - `GET /v1/facilitators` (List)
+    - `GET /v1/facilitators/:id` (View)
+    - `POST /v1/facilitators` (Create)
+    - `PATCH /v1/facilitators/:id` (Update)
+    - `POST /v1/sessions/:id/facilitators` (Assign to session)
+
+  - __Courses__:
+
+    - `GET /v1/courses` (List)
+    - `GET /v1/courses/:id` (View)
+    - `POST /v1/courses` (Create)
+    - `PATCH /v1/courses/:id` (Update)
+
+  - __NITs__:
+
+    - `GET /v1/nits` (List)
+    - `GET /v1/nits/:id` (View)
+    - `POST /v1/nits` (Create)
+    - `PATCH /v1/nits/:id` (Update)
+
+  - __Feedback__:
+
+    - `POST /v1/facilitators/:id/feedback` (Create)
+    - `GET /v1/facilitators/:id/feedback` (List)
+    - `POST /v1/courses/:id/feedback` (Create)
+    - `GET /v1/courses/:id/feedback` (List)
+
+#### 3. Administrator (`role_id = 1`)
+
+This role has __full access__ to the entire system and can perform any action.
+
+- __Permissions__: `admin:all`, which grants access to every permission.
+
+- __Accessible Endpoints__:
+
+  - __All endpoints__ available to the System User and Content Contributor.
+
+  - __Delete actions__:
+
+    - `DELETE /v1/officers/:id`
+    - `DELETE /v1/facilitators/:id`
+    - `DELETE /v1/courses/:id`
+    - `DELETE /v1/nits/:id`
+    - `DELETE /v1/sessions/:id/facilitators/:facilitator_id`
+
+  - __User Permission Management__:
+    - `POST /v1/users/:id/permissions` (Add permissions to a user).
+
+This covers the full scope of what each user can do based on the current setup. The original issue you had was because the system was not correctly checking permissions based on the user's role, which has now been fixed.

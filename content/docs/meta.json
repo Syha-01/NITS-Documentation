@@ -5,6 +5,7 @@
     "authentication",
     "users",
     "permissions",
+    "roles",
     "rate-limiting",
     "officers",
     "courses",
