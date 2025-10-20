@@ -106,6 +106,18 @@ Registers a new user and sends a welcome email with an activation token.
 - `personnel_id` (integer, optional): The ID of the associated personnel record.
 - `role_id` (integer, optional): The ID for the user's role. Defaults to `3` (System User).
 
+**Example Request:**
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test.user@example.com",
+    "password": "password123",
+    "role_id": 3
+  }' "http://localhost:4000/v1/users"
+```
+
 ### Activate User
 
 Activates a user's account using the token sent to their email.
@@ -118,6 +130,16 @@ Activates a user's account using the token sent to their email.
 {
     "token": "<activation_token>"
 }
+```
+
+**Example Request:**
+
+```bash
+curl -X PUT \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "YOUR_ACTIVATION_TOKEN"
+  }' "http://localhost:4000/v1/users/activated"
 ```
 
 ### Create Authentication Token
@@ -133,3 +155,14 @@ Creates an authentication token for an activated user.
     "email": "test.user@example.com",
     "password": "password123"
 }
+```
+
+**Example Request:**
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test.user@example.com",
+    "password": "password123"
+  }' "http://localhost:4000/v1/tokens/authentication"
