@@ -3,8 +3,8 @@
 # we ensure that all paths are treated as directories, which is the expected behavior
 # for the documentation pages.
 
-[[redirects]]
-  from = "/docs/*"
-  to = "/docs/:splat/"
-  status = 301
-  force = true
+#[[redirects]]
+#  from = "/docs/*"
+ # to = "/docs/:splat/"
+ # status = 301
+  #force = true
