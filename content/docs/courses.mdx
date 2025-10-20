@@ -7,11 +7,15 @@ description: API endpoints for managing courses.
 
 This section provides detailed information about the API endpoints for managing courses.
 
+**Authentication:** All endpoints in this section require a valid bearer token.
+
 ## List Courses
 
 Retrieves a list of all courses. This endpoint supports pagination to handle large datasets efficiently.
 
 **Endpoint:** `GET /v1/courses`
+
+To make this request, you need to be authenticated and have the `courses:read` permission. Include your authentication token in the `Authorization` header.
 
 **Query Parameters:**
 
@@ -21,7 +25,7 @@ Retrieves a list of all courses. This endpoint supports pagination to handle lar
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/courses?page=1&page_size=5"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/courses?page=1&page_size=5"
 ```
 
 **Example Success Response (200 OK):**
@@ -71,6 +75,8 @@ Creates a new course record in the database.
 
 **Endpoint:** `POST /v1/courses`
 
+To make this request, you need to be authenticated and have the `courses:write` permission. Include your authentication token in the `Authorization` header.
+
 **Request Body:**
 
 ```json
@@ -92,12 +98,15 @@ Creates a new course record in the database.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "title": "Cybersecurity Fundamentals",
     "description": "An introductory course on cybersecurity.",
     "category": "Elective",
     "credit_hours": 30
-}' "http://localhost:4000/v1/courses"
+  }' "http://localhost:4000/v1/courses"
 ```
 
 **Example Success Response (201 Created):**
@@ -138,10 +147,12 @@ Retrieves a specific course by its unique ID.
 
 **Endpoint:** `GET /v1/courses/:id`
 
+To make this request, you need to be authenticated and have the `courses:read` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/courses/1"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/courses/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -171,6 +182,8 @@ Updates a specific course's details. You only need to provide the fields you wan
 
 **Endpoint:** `PATCH /v1/courses/:id`
 
+To make this request, you need to be authenticated and have the `courses:write` permission. Include your authentication token in the `Authorization` header.
+
 **Request Body (Partial):**
 
 ```json
@@ -183,9 +196,12 @@ Updates a specific course's details. You only need to provide the fields you wan
 **Example Request:**
 
 ```bash
-curl -X PATCH -H "Content-Type: application/json" -d '{
+curl -X PATCH \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "credit_hours": 42
-}' "http://localhost:4000/v1/courses/1"
+  }' "http://localhost:4000/v1/courses/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -217,10 +233,12 @@ Deletes a specific course by its ID.
 
 **Endpoint:** `DELETE /v1/courses/:id`
 
+To make this request, you need to be authenticated and have the `courses:write` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl -X DELETE "http://localhost:4000/v1/courses/1"
+curl -X DELETE -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/courses/1"
 ```
 
 **Example Success Response (200 OK):**

@@ -1,12 +1,15 @@
 {
   "pages": [
     "index",
+    "healthcheck",
+    "authentication",
+    "users",
+    "permissions",
+    "rate-limiting",
     "officers",
     "courses",
-    "facilitators",
-    "feedback",
-    "healthcheck",
     "nits",
-    "users"
+    "facilitators",
+    "feedback"
   ]
 }

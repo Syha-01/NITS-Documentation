@@ -1,0 +1,57 @@
+---
+title: Permissions
+description: API endpoints for managing user permissions.
+---
+
+# Permissions
+
+The API uses a permission-based access control system. Permissions are assigned to users and checked by middleware for protected endpoints.
+
+## Available Permissions
+
+- `nits:read`: Allows reading NIT sessions.
+- `nits:write`: Allows creating, updating, and deleting NIT sessions.
+- `officers:read`: Allows reading officer data.
+- `officers:write`: Allows creating, updating, and deleting officer data.
+- `courses:read`: Allows reading course data.
+- `courses:write`: Allows creating, updating, and deleting course data.
+- `facilitators:read`: Allows reading facilitator data.
+- `facilitators:write`: Allows creating, updating, and deleting facilitator data.
+- `feedback:read`: Allows reading feedback.
+- `feedback:write`: Allows submitting feedback.
+- `admin:all`: Super-user permission that grants access to all endpoints, including administrative ones like adding permissions to other users.
+
+## Add a Permission to a User
+
+**Endpoint:** `POST /v1/users/:id/permissions`
+
+Adds a permission to a specific user. This is an administrative endpoint.
+
+**Permission Required:** `admin:all`
+
+### Request Body
+
+```json
+{
+  "code": "nits:write"
+}
+```
+
+### Response
+
+```json
+{
+    "message": "permission added to user successfully"
+}
+```
+
+### Example Request
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "code": "nits:write"
+  }' "http://localhost:4000/v1/users/1/permissions"
+```

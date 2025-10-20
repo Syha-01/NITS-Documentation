@@ -1,0 +1,29 @@
+---
+title: Rate Limiting
+description: Details on the API's rate limiting functionality.
+---
+
+# Rate Limiting
+
+The API uses a rate limiter to prevent abuse and ensure fair usage. By default, the rate limiter allows 5 requests per second with a burst of 2.
+
+## Test the rate limiter
+
+This command will send 8 requests to the healthcheck endpoint. If the rate limiter is enabled with the default settings, the first 5 requests should succeed and the next 3 should be rejected with a `429 Too Many Requests` status.
+
+```bash
+for i in {1..8}; do curl -i localhost:4000/v1/healthcheck; done
+```
+
+## Test with the rate limiter disabled
+
+To test with the rate limiter disabled, you need to start the server with the `-limiter-enabled=false` flag.
+
+```bash
+go run ./cmd/api -limiter-enabled=false
+```
+
+Then, run the same curl command. All 8 requests should succeed.
+
+```bash
+for i in {1..8}; do curl -i localhost:4000/v1/healthcheck; done

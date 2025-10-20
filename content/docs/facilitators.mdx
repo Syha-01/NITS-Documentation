@@ -13,6 +13,8 @@ Retrieves a list of all facilitators. This endpoint supports pagination to handl
 
 **Endpoint:** `GET /v1/facilitators`
 
+To make this request, you need to be authenticated and have the `facilitators:read` permission. Include your authentication token in the `Authorization` header.
+
 **Query Parameters:**
 
 *   `page` (integer): The page number to retrieve. Defaults to `1`.
@@ -21,7 +23,7 @@ Retrieves a list of all facilitators. This endpoint supports pagination to handl
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/facilitators?page=1&page_size=5"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/facilitators?page=1&page_size=5"
 ```
 
 **Example Success Response (200 OK):**
@@ -60,6 +62,8 @@ Creates a new facilitator record in the database.
 
 **Endpoint:** `POST /v1/facilitators`
 
+To make this request, you need to be authenticated and have the `facilitators:write` permission. Include your authentication token in the `Authorization` header.
+
 **Request Body:**
 
 ```json
@@ -79,12 +83,15 @@ Creates a new facilitator record in the database.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "first_name": "Jane",
     "last_name": "Smith",
     "email": "janesmith@example.com",
     "personnel_id": 2
-}' "http://localhost:4000/v1/facilitators"
+  }' "http://localhost:4000/v1/facilitators"
 ```
 
 **Example Success Response (201 Created):**
@@ -114,10 +121,12 @@ Retrieves a specific facilitator by their unique ID.
 
 **Endpoint:** `GET /v1/facilitators/:id`
 
+To make this request, you need to be authenticated and have the `facilitators:read` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/facilitators/1"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/facilitators/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -147,6 +156,8 @@ Updates a specific facilitator's details.
 
 **Endpoint:** `PATCH /v1/facilitators/:id`
 
+To make this request, you need to be authenticated and have the `facilitators:write` permission. Include your authentication token in the `Authorization` header.
+
 **Request Body (Partial):**
 
 ```json
@@ -158,9 +169,12 @@ Updates a specific facilitator's details.
 **Example Request:**
 
 ```bash
-curl -X PATCH -H "Content-Type: application/json" -d '{
+curl -X PATCH \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "email": "john.doe@newemail.com"
-}' "http://localhost:4000/v1/facilitators/1"
+  }' "http://localhost:4000/v1/facilitators/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -191,10 +205,12 @@ Deletes a specific facilitator by their ID.
 
 **Endpoint:** `DELETE /v1/facilitators/:id`
 
+To make this request, you need to be authenticated and have the `facilitators:write` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl -X DELETE "http://localhost:4000/v1/facilitators/1"
+curl -X DELETE -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/facilitators/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -217,6 +233,8 @@ Assigns a facilitator to a specific training session.
 
 **Endpoint:** `POST /v1/sessions/:id/facilitators`
 
+To make this request, you need to be authenticated and have the `facilitators:write` permission. Include your authentication token in the `Authorization` header.
+
 **Request Body:**
 
 ```json
@@ -228,9 +246,12 @@ Assigns a facilitator to a specific training session.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "facilitator_id": 1
-}' "http://localhost:4000/v1/sessions/1/facilitators"
+  }' "http://localhost:4000/v1/sessions/1/facilitators"
 ```
 
 **Example Success Response (201 Created):**
@@ -253,10 +274,12 @@ Removes a facilitator from a specific training session.
 
 **Endpoint:** `DELETE /v1/sessions/:id/facilitators/:facilitator_id`
 
+To make this request, you need to be authenticated and have the `facilitators:write` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl -X DELETE "http://localhost:4000/v1/sessions/1/facilitators/1"
+curl -X DELETE -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/sessions/1/facilitators/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -279,10 +302,12 @@ Retrieves a list of all facilitators assigned to a specific training session.
 
 **Endpoint:** `GET /v1/sessions/:id/facilitators`
 
+To make this request, you need to be authenticated and have the `facilitators:read` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/sessions/1/facilitators"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/sessions/1/facilitators"
 ```
 
 **Example Success Response (200 OK):**

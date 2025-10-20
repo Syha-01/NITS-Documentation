@@ -1,0 +1,86 @@
+---
+title: Authentication
+description: API endpoints for user authentication.
+---
+
+# Authentication
+
+The API uses a token-based authentication system. Users first register, then activate their account, and finally, generate an authentication token to access protected endpoints.
+
+## User Registration
+
+**Endpoint:** `POST /v1/users`
+
+Registers a new user and sends an activation email.
+
+### Request Body
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "personnel_id": 1,
+  "role_id": 3
+}
+```
+
+### Fields
+- `email` (string, required): The user's email address. Must be unique.
+- `password` (string, required): The user's password. Must be at least 8 characters long.
+- `personnel_id` (integer, optional): The ID of the associated personnel record.
+- `role_id` (integer, optional): The ID for the user's role. Defaults to `3` (system_user).
+
+### Response
+
+A successful registration returns the new user object and triggers a background job to send an activation email.
+
+```json
+{
+  "user": {
+    "id": 1,
+    "created_at": "2023-10-27T10:00:00Z",
+    "email": "user@example.com",
+    "activated": false,
+    "personnel_id": 1,
+    "role_id": 3,
+    "version": 1
+  }
+}
+```
+
+## Account Activation
+
+**Endpoint:** `PUT /v1/users/activated`
+
+Activates a user account with a token.
+
+### Request Body
+
+```json
+{
+  "token": "ACTIVATION_TOKEN_FROM_EMAIL"
+}
+```
+
+### Response
+
+Returns the updated user object with `activated` set to `true`.
+
+## Token Generation
+
+**Endpoint:** `POST /v1/tokens/authentication`
+
+Generates an authentication token for a user.
+
+### Request Body
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Response
+
+Returns an authentication token valid for 24 hours. This token must be included in the `Authorization` header for subsequent requests to protected endpoints (e.g., `Authorization: Bearer <TOKEN>`).

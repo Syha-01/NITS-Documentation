@@ -3,15 +3,19 @@ title: NITs
 description: API endpoints for managing National In-service Training (NITs).
 ---
 
+
 # National In-service Training (NITs)
 
 This section provides information about the endpoints for managing National In-service Training (NITs).
 
 ## Create a new training session
 
-Creates a new training session.
-
 **Endpoint:** `POST /v1/nits`
+
+Creates a new training session.
+**Permission Required:** `nits:write`
+
+To make this request, you need to be authenticated and have the `nits:write` permission. Include your authentication token in the `Authorization` header.
 
 **Request Body:**
 
@@ -34,12 +38,15 @@ Creates a new training session.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "course_id": 1,
     "start_date": "2025-12-01T00:00:00Z",
     "end_date": "2025-12-05T00:00:00Z",
     "location": "Training Academy"
-}' "http://localhost:4000/v1/nits"
+  }' "http://localhost:4000/v1/nits"
 ```
 
 **Example Success Response (201 Created):**
@@ -65,14 +72,17 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 ## Retrieve a training session
 
-Retrieves a specific training session by its unique ID.
-
 **Endpoint:** `GET /v1/nits/:id`
+
+Retrieves a specific training session by its ID.
+**Permission Required:** `nits:read`
+
+To make this request, you need to be authenticated and have the `nits:read` permission. Include your authentication token in the `Authorization` header.
 
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/nits/1"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/nits/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -98,9 +108,12 @@ curl "http://localhost:4000/v1/nits/1"
 
 ## Update a training session
 
-Updates a specific training session's details. You only need to provide the fields you want to change.
-
 **Endpoint:** `PATCH /v1/nits/:id`
+
+Updates a specific training session's details.
+**Permission Required:** `nits:write`
+
+To make this request, you need to be authenticated and have the `nits:write` permission. Include your authentication token in the `Authorization` header.
 
 **Request Body (Partial):**
 
@@ -113,9 +126,12 @@ Updates a specific training session's details. You only need to provide the fiel
 **Example Request:**
 
 ```bash
-curl -X PATCH -H "Content-Type: application/json" -d '{
+curl -X PATCH \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "location": "New Training Academy"
-}' "http://localhost:4000/v1/nits/1"
+  }' "http://localhost:4000/v1/nits/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -143,14 +159,17 @@ curl -X PATCH -H "Content-Type: application/json" -d '{
 
 ## Delete a training session
 
-Deletes a specific training session by its ID.
-
 **Endpoint:** `DELETE /v1/nits/:id`
+
+Deletes a specific training session.
+**Permission Required:** `nits:write`
+
+To make this request, you need to be authenticated and have the `nits:write` permission. Include your authentication token in the `Authorization` header.
 
 **Example Request:**
 
 ```bash
-curl -X DELETE "http://localhost:4000/v1/nits/1"
+curl -X DELETE -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/nits/1"
 ```
 
 **Example Success Response (200 OK):**
@@ -169,19 +188,23 @@ curl -X DELETE "http://localhost:4000/v1/nits/1"
 
 ## List all training sessions
 
-Retrieves a list of all training sessions. This endpoint supports pagination to handle large datasets efficiently.
-
 **Endpoint:** `GET /v1/nits`
+
+Retrieves a paginated list of all training sessions.
+**Permission Required:** `nits:read`
+
+To make this request, you need to be authenticated and have the `nits:read` permission. Include your authentication token in the `Authorization` header.
 
 **Query Parameters:**
 
 *   `page` (integer): The page number to retrieve. Defaults to `1`.
 *   `page_size` (integer): The number of records to retrieve per page. Defaults to `20`, with a maximum of `100`.
+*   `sort` (string, optional): The field to sort by (e.g., `start_date`, `-start_date`).
 
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/nits?page=1&page_size=5"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/nits?page=1&page_size=5"
 ```
 
 **Example Success Response (200 OK):**

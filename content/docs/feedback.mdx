@@ -13,6 +13,8 @@ Creates feedback for a specific facilitator.
 
 **Endpoint:** `POST /v1/facilitators/:id/feedback`
 
+To make this request, you need to be authenticated and have the `feedback:write` permission. Include your authentication token in the `Authorization` header.
+
 **Request Body:**
 
 ```json
@@ -26,7 +28,10 @@ Creates feedback for a specific facilitator.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
   "session_enrollment_id": 1,
   "score": 5,
   "comment": "Excellent facilitator!"
@@ -61,10 +66,12 @@ Retrieves all feedback for a specific facilitator.
 
 **Endpoint:** `GET /v1/facilitators/:id/feedback`
 
+To make this request, you need to be authenticated and have the `feedback:read` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/facilitators/1/feedback"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/facilitators/1/feedback"
 ```
 
 **Example Success Response (200 OK):**
@@ -96,6 +103,8 @@ Creates feedback for a specific course.
 
 **Endpoint:** `POST /v1/courses/:id/feedback`
 
+To make this request, you need to be authenticated and have the `feedback:write` permission. Include your authentication token in the `Authorization` header.
+
 **Request Body:**
 
 ```json
@@ -109,7 +118,10 @@ Creates feedback for a specific course.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
   "session_enrollment_id": 1,
   "score": 4,
   "comment": "The course was very informative."
@@ -144,10 +156,12 @@ Retrieves all feedback for a specific course.
 
 **Endpoint:** `GET /v1/courses/:id/feedback`
 
+To make this request, you need to be authenticated and have the `feedback:read` permission. Include your authentication token in the `Authorization` header.
+
 **Example Request:**
 
 ```bash
-curl "http://localhost:4000/v1/courses/1/feedback"
+curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/courses/1/feedback"
 ```
 
 **Example Success Response (200 OK):**
@@ -179,6 +193,8 @@ Submits a rating for a course, linked to a specific enrollment.
 
 **Endpoint:** `POST /v1/enrollments/:id/courserating`
 
+To make this request, you need to be an authenticated and activated user. Include your authentication token in the `Authorization` header.
+
 **Request Body:**
 
 ```json
@@ -191,10 +207,13 @@ Submits a rating for a course, linked to a specific enrollment.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "score": 5,
     "comment": "Great course!"
-}' "http://localhost:4000/v1/enrollments/1/courserating"
+  }' "http://localhost:4000/v1/enrollments/1/courserating"
 ```
 
 **Example Success Response (201 Created):**
@@ -224,6 +243,8 @@ Submits a rating for a facilitator, linked to a specific enrollment.
 
 **Endpoint:** `POST /v1/enrollments/:id/facilitatorrating`
 
+To make this request, you need to be an authenticated and activated user. Include your authentication token in the `Authorization` header.
+
 **Request Body:**
 
 ```json
@@ -237,11 +258,14 @@ Submits a rating for a facilitator, linked to a specific enrollment.
 **Example Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
     "facilitator_id": 1,
     "score": 5,
     "comment": "Excellent facilitator!"
-}' "http://localhost:4000/v1/enrollments/1/facilitatorrating"
+  }' "http://localhost:4000/v1/enrollments/1/facilitatorrating"
 ```
 
 **Example Success Response (201 Created):**

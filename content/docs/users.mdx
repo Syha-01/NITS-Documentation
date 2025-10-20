@@ -1,15 +1,92 @@
 ---
-title: Users
-description: API endpoints for managing users.
+title: Users & Authentication
+description: API endpoints for managing users and handling authentication.
 ---
 
-# Users
+# Users & Authentication
 
-This section provides detailed information about the API endpoints for managing users.
+This section provides detailed information about the API endpoints for managing users and handling authentication.
 
-## Register User
+## Summary of Changes
 
-Registers a new user.
+The recent updates to the API include the completion of the user authentication setup and the implementation of a Mailtrap integration for sending emails.
+
+### 1. User Authentication and Authorization
+
+The user authentication and authorization logic is now fully enabled. The `authenticate` middleware runs on every request, checking for a valid `Authorization` header. If a valid token is present, it fetches the corresponding user's details and adds them to the request context; otherwise, it treats the user as anonymous.
+
+### 2. Mailtrap Email Integration
+
+Email functionality has been added from scratch. A `Mailer` service now handles all the logic for connecting to the Mailtrap SMTP server, building email messages from templates, and sending them. When a new user registers, a welcome email is automatically sent in the background.
+
+## How to Test the Functionality
+
+### Step 1: Start the API
+
+First, make sure your API is running. Open your terminal in the project directory and execute:
+
+```bash
+make run/api
+```
+
+*(Note: Ensure your `TRAINING_DB_DSN` environment variable is set correctly.)*
+
+### Step 2: Register a New User
+
+Open a new terminal and run the following `curl` command to register a new user. This will create the user and trigger the welcome email.
+
+```bash
+BODY='{"email": "test.user@example.com", "password": "password123", "role_id": 3}'
+curl -i -d "$BODY" -H "Content-Type: application/json" localhost:4000/v1/users
+```
+
+### Step 3: Check Your Mailtrap Inbox
+
+After running the command above, go to your [Mailtrap Sandbox inbox](https://mailtrap.io/inboxes). You should see a new email addressed to `test.user@example.com`. Open it and copy the `activationToken` value.
+
+### Step 4: Activate the User
+
+Now, use the activation token you copied from the email to activate the user's account. Replace `YOUR_ACTIVATION_TOKEN` in the command below with the actual token.
+
+```bash
+TOKEN_BODY='{"token": "YOUR_ACTIVATION_TOKEN"}'
+curl -i -X PUT -d "$TOKEN_BODY" -H "Content-Type: application/json" localhost:4000/v1/users/activated
+```
+
+### Step 5: Authenticate and Get a Bearer Token
+
+Now that the user is activated, you can request an authentication token by providing their email and password.
+
+```bash
+AUTH_BODY='{"email": "test.user@example.com", "password": "password123"}'
+curl -i -d "$AUTH_BODY" -H "Content-Type: application/json" localhost:4000/v1/tokens/authentication
+```
+
+### Step 6: Access a Protected Resource
+
+Finally, use the authentication token to access a protected endpoint, like the health check endpoint. Replace `YOUR_AUTHENTICATION_TOKEN` with the token you copied in the previous step.
+
+```bash
+curl -i -H "Authorization: Bearer YOUR_AUTHENTICATION_TOKEN" localhost:4000/v1/healthcheck
+```
+
+---
+
+## User Roles
+
+The API uses a role-based access control system. Each user is assigned a role that determines their level of access. The available roles are:
+
+*   **Administrator** (`role_id: 1`): Can manage all aspects of the system, including users, courses, and facilitators.
+*   **Content Contributor** (`role_id: 2`): Can create, update, and manage courses and training sessions.
+*   **System User** (`role_id: 3`): Can view courses and training sessions, and provide feedback.
+
+When creating a new user, you can assign a role by providing the corresponding `role_id` in the request body. If no `role_id` is provided, the user will be assigned the `System User` role by default.
+
+## API Endpoints
+
+### Register User
+
+Registers a new user and sends a welcome email with an activation token.
 
 **Endpoint:** `POST /v1/users`
 
@@ -17,51 +94,21 @@ Registers a new user.
 
 ```json
 {
-    "name": "Alice",
-    "email": "alice@example.com",
-    "password": "pa55word"
+    "email": "test.user@example.com",
+    "password": "password123",
+    "role_id": 3
 }
 ```
 
-**Validation Rules:**
+**Fields:**
+- `email` (string, required): The user's email address. Must be unique.
+- `password` (string, required): The user's password. Must be at least 8 characters long.
+- `personnel_id` (integer, optional): The ID of the associated personnel record.
+- `role_id` (integer, optional): The ID for the user's role. Defaults to `3` (System User).
 
-*   `name`: Required. Must not be empty.
-*   `email`: Required. Must be a valid email address.
-*   `password`: Required. Must be at least 8 characters long.
+### Activate User
 
-**Example Request:**
-
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-    "name": "Alice",
-    "email": "alice@example.com",
-    "password": "pa55word"
-}' "http://localhost:4000/v1/users"
-```
-
-**Example Success Response (202 Accepted):**
-
-```json
-{
-    "user": {
-        "id": 1,
-        "name": "Alice",
-        "email": "alice@example.com",
-        "activated": false,
-        "version": 1
-    }
-}
-```
-
-**Error Handling:**
-
-*   If the request body is invalid or validation fails, you will receive a `422 Unprocessable Entity` response.
-
----
-
-## Activate User
-
-Activates a user account.
+Activates a user's account using the token sent to their email.
 
 **Endpoint:** `PUT /v1/users/activated`
 
@@ -73,37 +120,9 @@ Activates a user account.
 }
 ```
 
-**Example Request:**
+### Create Authentication Token
 
-```bash
-curl -X PUT -H "Content-Type: application/json" -d '{
-    "token": "J3Z3..."
-}' "http://localhost:4000/v1/users/activated"
-```
-
-**Example Success Response (200 OK):**
-
-```json
-{
-    "user": {
-        "id": 1,
-        "name": "Alice",
-        "email": "alice@example.com",
-        "activated": true,
-        "version": 2
-    }
-}
-```
-
-**Error Handling:**
-
-*   If the token is invalid or expired, you will receive a `422 Unprocessable Entity` response.
-
----
-
-## Create Authentication Token
-
-Creates an authentication token for a user.
+Creates an authentication token for an activated user.
 
 **Endpoint:** `POST /v1/tokens/authentication`
 
@@ -111,30 +130,6 @@ Creates an authentication token for a user.
 
 ```json
 {
-    "email": "alice@example.com",
-    "password": "pa55word"
+    "email": "test.user@example.com",
+    "password": "password123"
 }
-```
-
-**Example Request:**
-
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-    "email": "alice@example.com",
-    "password": "pa55word"
-}' "http://localhost:4000/v1/tokens/authentication"
-```
-
-**Example Success Response (201 Created):**
-
-```json
-{
-    "authentication_token": {
-        "token": "<auth_token>"
-    }
-}
-```
-
-**Error Handling:**
-
-*   If the request body is invalid or the credentials are incorrect, you will receive a `401 Unauthorized` response.
