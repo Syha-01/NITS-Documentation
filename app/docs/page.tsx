@@ -13,8 +13,21 @@ import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { docs } from '../../source.generated';
 import { toClientRenderer } from 'fumadocs-mdx/runtime/vite';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const slugs = params['*'].split('/').filter((v) => v.length > 0);
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { pathname } = new URL(request.url);
+  const splat = params['*'];
+
+  // Redirect to trailing slash
+  if (splat && splat.length > 1 && !pathname.endsWith('/')) {
+    return new Response(null, {
+      status: 301,
+      headers: {
+        Location: pathname + '/',
+      },
+    });
+  }
+
+  const slugs = splat.split('/').filter((v) => v.length > 0);
   const page = source.getPage(slugs);
   if (!page) throw new Response('Not found', { status: 404 });
 
