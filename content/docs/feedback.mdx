@@ -5,32 +5,174 @@ description: API endpoints for managing feedback and ratings.
 
 # Feedback and Ratings
 
-This section provides detailed information about the API endpoints for managing feedback and ratings.
+This section provides a comprehensive, step-by-step guide to submitting feedback for courses and facilitators.
 
-## Create Facilitator Feedback
+## Submitting Feedback: A Complete Walkthrough
 
-Creates feedback for a specific facilitator.
+To submit feedback, you must first be a registered, activated, and authenticated user. Then, you must be enrolled in a training session. This guide will walk you through the entire process, from start to finish.
 
-**Endpoint:** `POST /v1/facilitators/:id/feedback`
+### Step 1: Register a New User
 
-To make this request, you need to be authenticated and have the `feedback:write` permission. Include your authentication token in the `Authorization` header.
+First, register a new user account.
 
-**Request Body:**
-
-```json
-{
-  "session_enrollment_id": 1,
-  "score": 5,
-  "comment": "Excellent facilitator!"
-}
-```
+**Endpoint:** `POST /v1/users`
 
 **Example Request:**
 
 ```bash
 curl -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "email": "test.user@example.com",
+    "password": "password123",
+    "role_id": 3
+  }' "http://localhost:4000/v1/users"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "user": {
+        "id": 1,
+        "email": "test.user@example.com",
+        "activated": false,
+        "created_at": "...",
+        "version": 1
+    }
+}
+```
+
+From this response, you will need the `activationToken` that is sent to the user's email.
+
+### Step 2: Activate the User
+
+Next, activate the user's account using the token from the welcome email.
+
+**Endpoint:** `PUT /v1/users/activated`
+
+**Example Request:**
+
+```bash
+curl -X PUT \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "YOUR_ACTIVATION_TOKEN"
+  }' "http://localhost:4000/v1/users/activated"
+```
+
+### Step 3: Authenticate and Get a Bearer Token
+
+Now, exchange the user's credentials for an authentication token.
+
+**Endpoint:** `POST /v1/tokens/authentication`
+
+**Example Request:**
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test.user@example.com",
+    "password": "password123"
+  }' "http://localhost:4000/v1/tokens/authentication"
+```
+
+**Example Success Response (200 OK):**
+
+```json
+{
+    "authentication_token": {
+        "token": "YOUR_AUTHENTICATION_TOKEN",
+        "expiry": "..."
+    }
+}
+```
+
+Copy the `token` from the response. You will use this as your `<AUTH_TOKEN>` in the following steps.
+
+### Step 4: Create a Personnel Record
+
+Before a user can be enrolled in a training session, they must have a corresponding `personnel` record. This is typically created by an administrator.
+
+**Endpoint:** `POST /v1/officers`
+
+**Example Request:**
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <ADMIN_AUTH_TOKEN>" \
+  -d '{
+    "regulation_number": "12345",
+    "first_name": "John",
+    "last_name": "Doe",
+    "sex": "Male",
+    "rank_id": 1,
+    "formation_id": 1,
+    "posting_id": 1,
+    "is_active": true
+  }' "http://localhost:4000/v1/officers"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "officer": {
+        "id": 1,
+        "regulation_number": "12345",
+        "first_name": "John",
+        "last_name": "Doe",
+        "sex": "Male",
+        "rank_id": 1,
+        "formation_id": 1,
+        "posting_id": 1,
+        "is_active": true
+    }
+}
+```
+
+### Step 5: Enroll in a Training Session
+
+Once a `personnel` record exists, an administrator can enroll them in a training session.
+
+**Endpoint:** `POST /v1/nits/enroll`
+
+**Example Request:**
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <ADMIN_AUTH_TOKEN>" \
+  -d '{
+    "session_id": 1,
+    "personnel_id": 1
+  }' "http://localhost:4000/v1/nits/enroll"
+```
+
+**Example Success Response (201 Created):**
+
+```json
+{
+    "session_enrollment_id": 1
+}
+```
+
+This action creates a `session_enrollment` record and returns the unique `session_enrollment_id`.
+
+### Step 6: Submit Feedback for a Facilitator
+
+Now you can submit feedback for a facilitator. You will need the `session_enrollment_id` from the previous step, and the ID of the facilitator you are rating.
+
+**Endpoint:** `POST /v1/facilitators/:id/feedback`
+
+**Example Request:**
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <AUTH_TOKEN>" \
   -d '{
   "session_enrollment_id": 1,
   "score": 5,
@@ -53,74 +195,18 @@ curl -X POST \
 }
 ```
 
-**Error Handling:**
+### Step 7: Submit Feedback for a Course
 
-*   If the facilitator does not exist, you will receive a `404 Not Found` response.
-*   If the request body is invalid, you will receive a `422 Unprocessable Entity` response.
-
----
-
-## List Facilitator Feedback
-
-Retrieves all feedback for a specific facilitator.
-
-**Endpoint:** `GET /v1/facilitators/:id/feedback`
-
-To make this request, you need to be authenticated and have the `feedback:read` permission. Include your authentication token in the `Authorization` header.
-
-**Example Request:**
-
-```bash
-curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/facilitators/1/feedback"
-```
-
-**Example Success Response (200 OK):**
-
-```json
-{
-    "feedback": [
-        {
-            "id": 1,
-            "facilitator_id": 1,
-            "session_enrollment_id": 1,
-            "score": 5,
-            "comment": "Excellent facilitator!",
-            "created_at": "..."
-        }
-    ]
-}
-```
-
-**Error Handling:**
-
-*   If the facilitator does not exist, you will receive a `404 Not Found` response.
-
----
-
-## Create Course Feedback
-
-Creates feedback for a specific course.
+Similarly, you can submit feedback for a course.
 
 **Endpoint:** `POST /v1/courses/:id/feedback`
-
-To make this request, you need to be authenticated and have the `feedback:write` permission. Include your authentication token in the `Authorization` header.
-
-**Request Body:**
-
-```json
-{
-  "session_enrollment_id": 1,
-  "score": 4,
-  "comment": "The course was very informative."
-}
-```
 
 **Example Request:**
 
 ```bash
 curl -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <TOKEN>" \
+  -H "Authorization: Bearer <AUTH_TOKEN>" \
   -d '{
   "session_enrollment_id": 1,
   "score": 4,
@@ -141,148 +227,3 @@ curl -X POST \
         "created_at": "..."
     }
 }
-```
-
-**Error Handling:**
-
-*   If the course does not exist, you will receive a `404 Not Found` response.
-*   If the request body is invalid, you will receive a `422 Unprocessable Entity` response.
-
----
-
-## List Course Feedback
-
-Retrieves all feedback for a specific course.
-
-**Endpoint:** `GET /v1/courses/:id/feedback`
-
-To make this request, you need to be authenticated and have the `feedback:read` permission. Include your authentication token in the `Authorization` header.
-
-**Example Request:**
-
-```bash
-curl -H "Authorization: Bearer <TOKEN>" "http://localhost:4000/v1/courses/1/feedback"
-```
-
-**Example Success Response (200 OK):**
-
-```json
-{
-    "feedback": [
-        {
-            "id": 1,
-            "course_id": 1,
-            "session_enrollment_id": 1,
-            "score": 4,
-            "comment": "The course was very informative.",
-            "created_at": "..."
-        }
-    ]
-}
-```
-
-**Error Handling:**
-
-*   If the course does not exist, you will receive a `404 Not Found` response.
-
----
-
-## Create Course Rating
-
-Submits a rating for a course, linked to a specific enrollment.
-
-**Endpoint:** `POST /v1/enrollments/:id/courserating`
-
-To make this request, you need to be an authenticated and activated user. Include your authentication token in the `Authorization` header.
-
-**Request Body:**
-
-```json
-{
-    "score": 5,
-    "comment": "Great course!"
-}
-```
-
-**Example Request:**
-
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <TOKEN>" \
-  -d '{
-    "score": 5,
-    "comment": "Great course!"
-  }' "http://localhost:4000/v1/enrollments/1/courserating"
-```
-
-**Example Success Response (201 Created):**
-
-```json
-{
-    "feedback": {
-        "id": 1,
-        "course_id": 1,
-        "session_enrollment_id": 1,
-        "score": 5,
-        "comment": "Great course!",
-        "created_at": "..."
-    }
-}
-```
-
-**Error Handling:**
-
-*   If the enrollment does not exist, you will receive a `404 Not Found` response.
-
----
-
-## Create Facilitator Rating
-
-Submits a rating for a facilitator, linked to a specific enrollment.
-
-**Endpoint:** `POST /v1/enrollments/:id/facilitatorrating`
-
-To make this request, you need to be an authenticated and activated user. Include your authentication token in the `Authorization` header.
-
-**Request Body:**
-
-```json
-{
-    "facilitator_id": 1,
-    "score": 5,
-    "comment": "Excellent facilitator!"
-}
-```
-
-**Example Request:**
-
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <TOKEN>" \
-  -d '{
-    "facilitator_id": 1,
-    "score": 5,
-    "comment": "Excellent facilitator!"
-  }' "http://localhost:4000/v1/enrollments/1/facilitatorrating"
-```
-
-**Example Success Response (201 Created):**
-
-```json
-{
-    "feedback": {
-        "id": 1,
-        "facilitator_id": 1,
-        "session_enrollment_id": 1,
-        "score": 5,
-        "comment": "Excellent facilitator!",
-        "created_at": "..."
-    }
-}
-```
-
-**Error Handling:**
-
-*   If the enrollment or facilitator does not exist, you will receive a `404 Not Found` response.
