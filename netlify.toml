@@ -1,10 +1,4 @@
-# The following redirect is intended to fix issues where URLs without a trailing slash
-# are not correctly handled by the routing mechanism. By enforcing a trailing slash,
-# we ensure that all paths are treated as directories, which is the expected behavior
-# for the documentation pages.
-
-#[[redirects]]
- # from = "/docs/*"
-  #to = "/docs/:splat/"
-  #status = 301
-  #force = true
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
